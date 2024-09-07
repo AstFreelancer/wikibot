@@ -32,4 +32,4 @@ def get_openai_response(url: str):
         ],
         max_tokens=300,
     )
-    return response.choices[0].message['content'].strip()
+    return response.choices[0].message.content.strip()
