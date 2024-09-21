@@ -110,7 +110,8 @@ async def main():
             BotCommand(command="/prompts", description="Показать мои промпты"),
             BotCommand(command="/add", description="Добавить новый промпт"),
             BotCommand(command="/edit", description="Редактировать промпт"),
-            BotCommand(command="/delete", description="Удалить промпт")
+            BotCommand(command="/delete", description="Удалить промпт"),
+            BotCommand(command="/cancel", description="Отменить команду")
         ]
         )
 
