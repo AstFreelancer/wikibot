@@ -18,23 +18,23 @@ from time_delta import get_seconds_to_midnight
 from logging.handlers import TimedRotatingFileHandler
 
 # Настройка обработчика логов с ротацией по времени
-# handler = TimedRotatingFileHandler(
-#    filename='my_log.log',
-#    when='midnight',         # Ротация в полночь
-#    interval=1,              # Частота ротации - раз в сутки
-#    backupCount=7,           # Сохранять последние 7 файлов логов
-#    encoding='utf-8'
-#)
+handler = TimedRotatingFileHandler(
+    filename='my_log.log',
+    when='midnight',         # Ротация в полночь
+    interval=1,              # Частота ротации - раз в сутки
+    backupCount=7,           # Сохранять последние 7 файлов логов
+    encoding='utf-8'
+)
 
 # Форматирование логов
-#formatter = logging.Formatter(
-#    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-#)
-#handler.setFormatter(formatter)
-#logging.basicConfig(
-#    level=logging.DEBUG,
-#    handlers=[handler]
-#)
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+handler.setFormatter(formatter)
+logging.basicConfig(
+    level=logging.DEBUG,
+    handlers=[handler]
+)
 
 # список тех, кто уже превысил суточный лимит
 cache_limit = TTLCache(config.max_cache_size, get_seconds_to_midnight())
