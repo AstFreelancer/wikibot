@@ -47,7 +47,8 @@ def get_openai_response(url: str = None, prompt_text: str = None):
     #    if 'message' not in first_choice or 'content' not in first_choice['message']:
     #        raise ValueError("Первый выбор не содержит 'message' или 'content'.")
 
-        return response['choices'][0]['message']['content'].strip()
+#        return response['choices'][0]['message']['content'].strip()
+        return response.choices[0].message.content.strip()
 
     except ValueError as e:
         logging.error(f"Ошибка в структуре ответа: {e}")
