@@ -38,6 +38,7 @@ def get_openai_response(url: str = None, prompt_text: str = None):
             ],
             max_tokens=300,
         )
+        print(response)
         # Проверка ответа на наличие необходимых данных
         if 'choices' not in response or not response['choices']:
             raise ValueError("Ответ от API не содержит 'choices' или список пуст.")
