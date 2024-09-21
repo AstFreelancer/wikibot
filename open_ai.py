@@ -38,16 +38,16 @@ def get_openai_response(url: str = None, prompt_text: str = None):
             ],
             max_tokens=300,
         )
-        print(response)
+   #     print(response)
         # Проверка ответа на наличие необходимых данных
-        if 'choices' not in response or not response['choices']:
-            raise ValueError("Ответ от API не содержит 'choices' или список пуст.")
+   #     if 'choices' not in response or not response['choices']:
+   #         raise ValueError("Ответ от API не содержит 'choices' или список пуст.")
 
-        first_choice = response['choices'][0]
-        if 'message' not in first_choice or 'content' not in first_choice['message']:
-            raise ValueError("Первый выбор не содержит 'message' или 'content'.")
+    #    first_choice = response['choices'][0]
+    #    if 'message' not in first_choice or 'content' not in first_choice['message']:
+    #        raise ValueError("Первый выбор не содержит 'message' или 'content'.")
 
-        return first_choice['message']['content'].strip()
+        return response['choices'][0]['message']['content'].strip()
 
     except ValueError as e:
         logging.error(f"Ошибка в структуре ответа: {e}")
