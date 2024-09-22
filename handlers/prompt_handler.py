@@ -533,7 +533,6 @@ async def handle_files(message: Message):
 @router.message(F.text, GoodPromptFilter())
 async def default_dialog(message: Message, db: Database):
     try:
-        await message.reply("Просто болтаем с нейросетью")
         await process_query(message, db, message.text)
     except Exception as e:
         logging.error(f"Ошибка при диалоге: {e}")
