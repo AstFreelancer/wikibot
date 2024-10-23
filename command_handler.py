@@ -88,7 +88,7 @@ async def buy_subscription(message: Message, state: FSMContext, db: Database):
             )
     except Exception as e:
         logging.error(f"Ошибка при выполнении команды /buy: {e}")
-        await message.reply("Произошла ошибка при обработке команды.")
+        await message.reply("Произошла ошибка при обработке команды!")
         current_state = await state.get_state()
         if current_state is not None:
             await state.clear()
