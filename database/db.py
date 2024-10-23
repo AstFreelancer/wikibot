@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from datetime import date, datetime
 from typing import Optional, List, Any
 import asyncpg
 
@@ -115,7 +116,8 @@ class Database(metaclass=SingletonMeta):
                     telegram_id BIGINT UNIQUE NOT NULL,
                     is_admin BOOLEAN NOT NULL DEFAULT FALSE,
                     daily_requests INTEGER NOT NULL DEFAULT 0,
-                    total_requests INTEGER NOT NULL DEFAULT 0
+                    total_requests INTEGER NOT NULL DEFAULT 0,
+                    last_payment_date DATE DEFAULT NULL
                 );
                 CREATE TABLE IF NOT EXISTS prompts (
                     id SERIAL PRIMARY KEY,
@@ -221,6 +223,31 @@ class Database(metaclass=SingletonMeta):
             raise
 
     @ensure_pool
+    async def update_payment(self, telegram_id: int) -> Optional[bool]:
+        if not isinstance(telegram_id, int):
+            raise ValueError("telegram_id должен быть целым числом")
+        try:
+            today = date.today()
+            result = await self.execute('''
+                UPDATE users
+                SET is_admin = TRUE,
+                    last_payment_date = $2
+                WHERE telegram_id = $1
+            ''', telegram_id, today)
+
+            # Убедимся, что результат не пуст
+            if result == 0:
+                logging.warning(f"Не удалось обновить дату платежа для пользователя {telegram_id}")
+                return False
+            return True
+        except asyncpg.PostgresError as e:
+            logging.error(f"Ошибка выполнения запроса: {e}")
+            raise
+        except Exception as e:
+            logging.error(f"Неизвестная ошибка при обновлении даты платежа: {e}")
+            raise
+
+    @ensure_pool
     async def reset_daily_requests(self) -> None:
         try:
             await self.execute('UPDATE users SET daily_requests = 0')
@@ -261,7 +288,7 @@ class Database(metaclass=SingletonMeta):
         if not isinstance(telegram_id, int):
             raise ValueError("telegram_id должен быть целым числом")
         from config import config  # Lazy import to avoid circular dependency
-        if not config.daily_limit:
+        if not config.daily_limit_free:
             logging.warning("В настройках не установлено значение дневного лимита на запросы")
             return True
 
@@ -272,7 +299,7 @@ class Database(metaclass=SingletonMeta):
                 logging.warning(f"Пользователь {telegram_id} был не зарегистрирован, но мы оперативно исправили")
                 user = await self.fetchrow('SELECT is_admin, daily_requests FROM users WHERE telegram_id=$1', telegram_id)
 
-            if user and (user['is_admin'] or user['daily_requests'] < config.daily_limit):
+            if user and user['daily_requests'] < config.daily_limit_paid and (user['is_admin'] or user['daily_requests'] < config.daily_limit_free):
                 return True
             return False
         except asyncpg.PostgresError as e:
@@ -363,6 +390,28 @@ class Database(metaclass=SingletonMeta):
             raise
         except Exception as e:
             logging.error(f"Неизвестная ошибка при получении текста промпта по ID: {e}")
+            raise
+
+    @ensure_pool
+    async def get_last_payment_date(self, telegram_id: int) -> Optional[datetime]:
+        if not isinstance(telegram_id, int):
+            raise ValueError("telegram_id должен быть целым числом")
+        try:
+            row = await self.fetchrow('''
+                SELECT last_payment_date
+                FROM users
+                WHERE telegram_id = $1
+            ''', telegram_id)
+
+            # Если поле last_payment_date NULL, метод fetchrow вернёт None
+            if row:
+                return row['last_payment_date']  # Может быть datetime или None
+            return None  # Если результат пустой (row == None)
+        except asyncpg.PostgresError as e:
+            logging.error(f"Ошибка выполнения запроса: {e}")
+            raise
+        except Exception as e:
+            logging.error(f"Неизвестная ошибка при получении даты последней оплаты: {e}")
             raise
 
     @ensure_pool

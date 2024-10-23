@@ -20,13 +20,17 @@ class Config:
                 cls.__instance.max_prompt_len = env.int('MAX_PROMPT_LEN', default=1000)
                 cls.__instance.max_query_len = env.int('MAX_QUERY_LEN', default=1000)
                 cls.__instance.command_list = [f"/{cmd.strip()}" for cmd in env('COMMAND_LIST').split(',')]
-                cls.__instance.daily_limit = env.int('DAILY_LIMIT', default=10)
+                cls.__instance.daily_limit_free = env.int('DAILY_LIMIT_FREE', default=10)
+                cls.__instance.daily_limit_paid = env.int('DAILY_LIMIT_PAID', default=50)
                 cls.__instance.database_url = env('DATABASE_URL')
                 cls.__instance.max_cache_size = env.int('MAX_CACHE_SIZE', default=10000)
                 cls.__instance.ttl = env.int('TTL', default=86400)
                 cls.__instance.default_prompts = [f"{p.strip()}" for p in env('DEFAULT_PROMPTS').split(';')]
                 cls.__instance.admin = env.int('ADMIN', default=683708227)
                 cls.__instance.max_prompts_per_user = env.int('MAX_PROMPTS_PER_USER', default=10)
+                cls.__instance.provider_token = env('PROVIDER_TOKEN')
+                cls.__instance.currency = env('CURRENCY')
+                cls.__instance.price = env.int('PRICE')
             return cls.__instance
         except EnvError as e:
             logging.error(f"Ошибка чтения переменных окружения: {e}")

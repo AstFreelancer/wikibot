@@ -1,15 +1,13 @@
 import asyncio
 import logging
 
-from aiogram import Bot, Dispatcher
-from aiogram.client.default import DefaultBotProperties
+from loader import dp, bot
 from aiogram.types import BotCommand
 from cachetools import TTLCache
 
 from database.db import Database
 from handlers import command_handler, prompt_handler
 from config import config
-from aiogram.enums import ParseMode
 
 from middlewares.database_middleware import DatabaseMiddleware
 from middlewares.throttling_middleware import ThrottlingMiddleware
@@ -93,8 +91,6 @@ async def shutdown():
 
 async def main():
     try:
-        bot = Bot(token=config.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-        dp = Dispatcher()
         # Регистрируем роутеры в диспетчере
         dp.include_router(command_handler.router)
         dp.include_router(prompt_handler.router)
@@ -107,16 +103,16 @@ async def main():
         await bot.set_my_commands([
             BotCommand(command="/start", description="Запустить бота"),
             BotCommand(command="/help", description="Показать справку"),
+            BotCommand(command="/buy", description="Купить/проверить подписку"),
             BotCommand(command="/prompts", description="Показать мои промпты"),
             BotCommand(command="/add", description="Добавить новый промпт"),
             BotCommand(command="/edit", description="Редактировать промпт"),
             BotCommand(command="/delete", description="Удалить промпт"),
             BotCommand(command="/cancel", description="Отменить команду")
-        ]
-        )
+        ])
 
         logging.info('Запускаем бота')
-        await dp.start_polling(bot, skip_updates=True)
+        await dp.start_polling(bot, skip_updates=False) #  Это спасет от проблем при обработке платежей.
     except Exception as e:
         logging.error(f"Ошибка при работе бота: {e}")
     finally:
