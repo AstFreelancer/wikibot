@@ -1,3 +1,4 @@
+import json
 import logging
 
 from environs import Env, EnvError
@@ -31,6 +32,24 @@ class Config:
                 cls.__instance.provider_token = env('PROVIDER_TOKEN')
                 cls.__instance.currency = env('CURRENCY')
                 cls.__instance.price = env.int('PRICE')
+                provider_data = {
+                    "provider_data": {
+                        "receipt": {
+                            "items": [
+                                {
+                                    "description": "Подписка на месяц",
+                                    "quantity": "1.00",
+                                    "amount": {
+                                        "value": f"{cls.__instance.price / 100:.2f}",
+                                        "currency": cls.__instance.currency
+                                    },
+                                    "vat_code": 1
+                                }
+                            ]
+                        }
+                    }
+                }
+                cls.__instance.provider_data = json.dumps(provider_data)
             return cls.__instance
         except EnvError as e:
             logging.error(f"Ошибка чтения переменных окружения: {e}")
