@@ -78,12 +78,11 @@ async def buy_subscription(message: Message, state: FSMContext, db: Database):
 
             prices = [LabeledPrice(label='Оплата заказа', amount=config.price)]
             provider_data = {
-                "provider_data": {
                     "receipt": {
                         "items": [
                             {
                                 "description": "Подписка на месяц",
-                                "quantity": "1.00",
+                                "quantity": "1",
                                 "amount": {
                                     "value": "99.00",
                                     "currency": "RUB"
@@ -92,7 +91,6 @@ async def buy_subscription(message: Message, state: FSMContext, db: Database):
                             }
                         ]
                     }
-                }
             }
             import json
             provider_data_json = json.dumps(provider_data)
@@ -100,7 +98,7 @@ async def buy_subscription(message: Message, state: FSMContext, db: Database):
             await state.set_state(FSMPrompt.buying)
             from loader import bot
             await bot.send_invoice(
-                chat_id=message.from_user.id,
+                chat_id=message.chat.id,
                 title='Покупка подписки',
                 description='Оплата подписки на месяц',
                 payload='subscription',
@@ -121,7 +119,7 @@ async def buy_subscription(message: Message, state: FSMContext, db: Database):
 
 
 # стандартный код для обработки апдейта типа PreCheckoutQuery, на который нам необходимо ответить в течение десяти секунд
-@router.pre_checkout_query(StateFilter(FSMPrompt.buying))
+@router.pre_checkout_query()
 async def process_pre_checkout_query(pre_checkout_query: PreCheckoutQuery):
     try:
         from loader import bot
