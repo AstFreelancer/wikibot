@@ -33,7 +33,6 @@ class Config:
                 cls.__instance.currency = env('CURRENCY')
                 cls.__instance.price = env.int('PRICE')
                 provider_data = {
-                    "provider_data": {
                         "receipt": {
                             "items": [
                                 {
@@ -47,7 +46,6 @@ class Config:
                                 }
                             ]
                         }
-                    }
                 }
                 cls.__instance.provider_data = json.dumps(provider_data)
             return cls.__instance
