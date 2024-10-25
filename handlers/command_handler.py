@@ -112,6 +112,7 @@ async def buy_subscription(message: Message, state: FSMContext, db: Database):
                 send_phone_number_to_provider=True,
                 provider_data=provider_data_json
             )
+            logging.info("я тут был")
     except Exception as e:
         logging.error(f"Ошибка при выполнении команды /buy: {e}")
         await message.answer("Произошла ошибка при обработке команды!")
@@ -124,8 +125,10 @@ async def buy_subscription(message: Message, state: FSMContext, db: Database):
 @router.pre_checkout_query()
 async def process_pre_checkout_query(pre_checkout_query: PreCheckoutQuery):
     try:
+        logging.info("обрабатываю апдейт PreCheckoutQuery")
         from loader import bot
         await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True)  # всегда отвечаем утвердительно
+        logging.info("обработал PreCheckoutQuery")
     except Exception as e:
         logging.error(f"Ошибка при обработке апдейта типа PreCheckoutQuery: {e}")
 
