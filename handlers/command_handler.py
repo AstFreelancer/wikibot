@@ -94,7 +94,7 @@ async def buy_subscription(message: Message, state: FSMContext, db: Database):
                     }
                 }
             }
-            from json import json
+            import json
             provider_data_json = json.dumps(provider_data)
 
             await state.set_state(FSMPrompt.buying)
