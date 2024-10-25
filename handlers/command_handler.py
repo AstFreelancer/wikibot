@@ -100,7 +100,7 @@ async def buy_subscription(message: Message, state: FSMContext, db: Database):
             await state.set_state(FSMPrompt.buying)
             from loader import bot
             await bot.send_invoice(
-                chat_id=message.chat.id,
+                chat_id=message.from_user.id,
                 title='Покупка подписки',
                 description='Оплата подписки на месяц',
                 payload='subscription',
