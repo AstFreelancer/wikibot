@@ -77,24 +77,6 @@ async def buy_subscription(message: Message, state: FSMContext, db: Database):
                 await message.reply("Для оплаты используйте данные тестовой карты: 1111 1111 1111 1026, 12/22, CVC 000.")
 
             prices = [LabeledPrice(label='Оплата заказа', amount=config.price)]
-            provider_data = {
-                    "receipt": {
-                        "items": [
-                            {
-                                "description": "Подписка на месяц",
-                                "quantity": "1",
-                                "amount": {
-                                    "value": "99.00",
-                                    "currency": "RUB"
-                                },
-                                "vat_code": 1
-                            }
-                        ]
-                    }
-            }
-            import json
-            provider_data_json = json.dumps(provider_data)
-
             await state.set_state(FSMPrompt.buying)
             from loader import bot
             await bot.send_invoice(
@@ -108,7 +90,7 @@ async def buy_subscription(message: Message, state: FSMContext, db: Database):
                 prices=prices,
                 need_phone_number=True,
                 send_phone_number_to_provider=True,
-                provider_data=provider_data_json
+                provider_data=config.provider_data
             )
     except Exception as e:
         logging.error(f"Ошибка при выполнении команды /buy: {e}")
