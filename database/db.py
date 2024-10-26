@@ -145,15 +145,10 @@ class Database(metaclass=SingletonMeta):
                 INSERT INTO users (telegram_id, is_admin)
                 VALUES ($1, $2)
                 ON CONFLICT (telegram_id) DO NOTHING
-                RETURNING telegram_id
             ''', telegram_id, is_admin)
-            
-            #result = INSERT 0, 1
-            # 0 представляет количество строк, затронутых командой предварительной проверки (CHECK),
-            # а 1 - количество строк, вставленных командой INSERT.
-            # осталось получить этот параметр, чтобы узнать, была ли вставка
-            _, _, inserted_count = result.split()
-            if inserted_count == '1':
+
+            n = await self.get_user_prompts_count(telegram_id)
+            if n == 0:
                 # Добавляем промпты по умолчанию
                 from config import config
                 for prompt in config.default_prompts:
