@@ -141,16 +141,18 @@ class Database(metaclass=SingletonMeta):
             raise ValueError("is_admin должен быть булевым значением")
         try:
             # значения передаются как параметры запроса, поэтому в asyncpg автоматически экранируются
-            await self.execute('''
+            result = await self.execute('''
                 INSERT INTO users (telegram_id, is_admin)
                 VALUES ($1, $2)
                 ON CONFLICT (telegram_id) DO NOTHING
+                RETURNING telegram_id
             ''', telegram_id, is_admin)
 
-            # Добавляем промпты по умолчанию
-            from config import config
-            for prompt in config.default_prompts:
-                await self.add_user_prompt(telegram_id, prompt)
+            if result:
+                # Добавляем промпты по умолчанию
+                from config import config
+                for prompt in config.default_prompts:
+                    await self.add_user_prompt(telegram_id, prompt)
         except asyncpg.PostgresError as e:
             logging.error(f"Ошибка при добавлении пользователя: {e}")
             raise
