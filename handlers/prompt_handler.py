@@ -473,6 +473,12 @@ async def send_photo(message: Message, db: Database):
 @router.message(Command(commands=['admin']), IsAdminFilter())
 async def admin(message: Message, db: Database):
     try:
+        n_users = await db.get_users_count()
+        await message.answer(f"Всего пользователей: {n_users}")
+
+        n_requests = await db.get_requests_count()
+        await message.answer(f"Запросов за сегодня: {n_requests}")
+
         top_users = await db.get_top_users(order_by='daily_requests')
         if top_users:
             table = make_table(top_users, order_by='daily_requests')
