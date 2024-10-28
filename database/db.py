@@ -355,6 +355,42 @@ class Database(metaclass=SingletonMeta):
             raise
 
     @ensure_pool
+    async def get_users_count(self) -> int:
+        try:
+            row = await self.fetchrow('''
+                SELECT COUNT(*) as count
+                FROM users
+            ''')
+
+            if row and 'count' in row:  # Проверяем, наличие результата и ключа 'count'
+                return row['count']
+            return 0
+        except asyncpg.PostgresError as e:
+            logging.error(f"Ошибка выполнения запроса: {e}")
+            raise
+        except Exception as e:
+            logging.error(f"Неизвестная ошибка при подсчете числа пользователей: {e}")
+            raise
+
+    @ensure_pool
+    async def get_requests_count(self) -> int:
+        try:
+            row = await self.fetchrow('''
+                SELECT SUM(daily_requests) as count
+                FROM users
+            ''')
+
+            if row and 'count' in row:  # Проверяем, наличие результата и ключа 'count'
+                return row['count']
+            return 0
+        except asyncpg.PostgresError as e:
+            logging.error(f"Ошибка выполнения запроса: {e}")
+            raise
+        except Exception as e:
+            logging.error(f"Неизвестная ошибка при подсчете числа запросов: {e}")
+            raise
+
+    @ensure_pool
     async def get_prompt_by_id(self, prompt_id: int) -> Optional[Prompt]:
         if not isinstance(prompt_id, int):
             raise ValueError("prompt_id должен быть целым числом")
