@@ -476,6 +476,9 @@ async def admin(message: Message, db: Database):
         n_users = await db.get_users_count()
         await message.answer(f"Всего пользователей: {n_users}")
 
+        n_payed_users = await db.get_payed_users_count()
+        await message.answer(f"Премиум пользователей: {n_payed_users}")
+
         n_requests = await db.get_requests_count()
         await message.answer(f"Запросов за сегодня: {n_requests}")
 
