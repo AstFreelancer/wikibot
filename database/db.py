@@ -373,6 +373,24 @@ class Database(metaclass=SingletonMeta):
             raise
 
     @ensure_pool
+    async def get_payed_users_count(self) -> int:
+        try:
+            row = await self.fetchrow('''
+                SELECT COUNT(*) as count
+                FROM users
+                WHERE last_payment_date IS NOT NULL
+            ''')
+
+            if row and 'count' in row:  # Проверяем, наличие результата и ключа 'count'
+                return row['count']
+            return 0
+        except asyncpg.PostgresError as e:
+            logging.error(f"Ошибка выполнения запроса: {e}")
+            raise
+        except Exception as e:
+            logging.error(f"Неизвестная ошибка при подсчете числа премиум пользователей: {e}")
+            raise
+    @ensure_pool
     async def get_requests_count(self) -> int:
         try:
             row = await self.fetchrow('''
