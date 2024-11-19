@@ -36,7 +36,7 @@ def get_openai_response(url: str = None, prompt_text: str = None):
                     "content": content,
                 }
             ],
-            max_tokens=300,
+            max_tokens=1000,
         )
    #     print(response)
         # Проверка ответа на наличие необходимых данных
