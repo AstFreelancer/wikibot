@@ -120,6 +120,9 @@ async def process_successful_payment(message: Message, state: FSMContext, db: Da
         current_state = await state.get_state()
         if current_state is not None:
             await state.clear()  # чтобы свободно перейти сюда из любого другого состояния
+        from loader import bot
+        from config import config
+        await bot.send_message(config.admin, "Получен платеж!")
     except Exception as e:
         logging.error(f"Ошибка при отправке сообщения об успешном платеже: {e}")
 
